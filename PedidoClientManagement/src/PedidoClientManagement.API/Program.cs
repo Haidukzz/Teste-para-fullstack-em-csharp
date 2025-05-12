@@ -7,16 +7,26 @@ using PedidoClientManagement.API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1) EF + PostgreSQL
-// -> instale antes: dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
-builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+// 1) String fixa com sua senha embutida
+var fixedConnectionString = 
+    "Host=dpg-d0h4j33e5dus73d4ifcg-a.oregon-postgres.render.com;" +
+    "Port=5432;" +
+    "Database=pedido_client_db_1164;" +
+    "Username=haidukzz;" +
+    "Password=6rs2dR2WYslMVvJwi7uwRPnes6U8BDFg;" +
+    "SSL Mode=Require;Trust Server Certificate=true";
 
-// 2) CORS
+Console.WriteLine($"→ Usando hard-coded connection string: {fixedConnectionString}");
+
+// 2) EF + PostgreSQL usando a string fixa
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseNpgsql(fixedConnectionString));
+
+// 3) CORS
 builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
-// 3) Controllers + JSON cycles off
+// 4) Controllers + JSON cycles off
 builder.Services.AddControllers()
     .AddJsonOptions(opts =>
     {
@@ -24,12 +34,12 @@ builder.Services.AddControllers()
         opts.JsonSerializerOptions.WriteIndented = true;
     });
 
-// 4) arquivos estáticos
+// 5) Arquivos estáticos
 builder.Services.AddDirectoryBrowser();
 
 var app = builder.Build();
 
-// **Auto-aplica migrações ao iniciar**
+// **Auto-aplica migrações no startup**
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
