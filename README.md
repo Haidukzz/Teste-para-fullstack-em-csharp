@@ -14,7 +14,6 @@ Trata-se de um serviço backend escrito em C# utilizando .NET, expondo endpoints
 - **Render** – Plataforma de hospedagem em nuvem usada para deploy da API e do banco.
 
 ## Organização do Projeto
-
 PedidoClientManagement.API/
 ├── Controllers/
 │ ├── ClientesController.cs
