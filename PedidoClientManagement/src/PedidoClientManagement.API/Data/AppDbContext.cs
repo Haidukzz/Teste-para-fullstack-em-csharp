@@ -1,4 +1,7 @@
+using System;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.EntityFrameworkCore.Metadata;
 using PedidoClientManagement.API.Models;
 
@@ -9,7 +12,6 @@ namespace PedidoClientManagement.API.Data
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
 
-        // Tabelas (DbSets)
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<ItemPedido> ItensPedido { get; set; }
@@ -23,16 +25,32 @@ namespace PedidoClientManagement.API.Data
                 .HasIndex(c => c.CPF)
                 .IsUnique();
 
-            // Configuração global de precisão para propriedades decimais
+            // Conversor global: sempre ler/gravar DateTime como UTC
+            var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+                v => v.Kind == DateTimeKind.Utc
+                     ? v
+                     : v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+            );
+
+            // Aplicar converter a todas as propriedades DateTime do modelo
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
-                var decimalProperties = entityType.GetProperties()
+                // decimal precision
+                var decimalProps = entityType.GetProperties()
                     .Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?));
-
-                foreach (var property in decimalProperties)
+                foreach (var prop in decimalProps)
                 {
-                    property.SetPrecision(18);
-                    property.SetScale(2);
+                    prop.SetPrecision(18);
+                    prop.SetScale(2);
+                }
+
+                // DateTime UTC converter
+                var dateTimeProps = entityType.GetProperties()
+                    .Where(p => p.ClrType == typeof(DateTime));
+                foreach (var prop in dateTimeProps)
+                {
+                    prop.SetValueConverter(dateTimeConverter);
                 }
             }
         }

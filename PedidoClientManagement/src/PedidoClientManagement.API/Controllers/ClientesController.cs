@@ -32,7 +32,7 @@ namespace PedidoClientManagement.API.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var cliente = await _context.Clientes.FindAsync(id);
-            if (cliente == null) 
+            if (cliente == null)
                 return NotFound();
             return Ok(cliente);
         }
@@ -41,10 +41,13 @@ namespace PedidoClientManagement.API.Controllers
         [HttpGet("auth")]
         public async Task<IActionResult> Authenticate([FromQuery] string cpf, [FromQuery] DateTime dataNascimento)
         {
+            // garantir que a data de consulta fique em UTC
+            var dataUtc = DateTime.SpecifyKind(dataNascimento, DateTimeKind.Utc);
+
             var cliente = await _context.Clientes
                 .FirstOrDefaultAsync(c =>
                     c.CPF == cpf &&
-                    c.DataNascimento.Date == dataNascimento.Date);
+                    c.DataNascimento.Date == dataUtc.Date);
 
             if (cliente == null)
                 return NotFound("CPF ou data de nascimento inválidos.");
@@ -65,7 +68,16 @@ namespace PedidoClientManagement.API.Controllers
             if (await _context.Clientes.AnyAsync(c => c.CPF == cliente.CPF))
                 return Conflict("CPF já cadastrado.");
 
-            if (cliente.DataNascimento > DateTime.Now.AddYears(-18))
+            // converter DataNascimento para UTC antes de qualquer validação de idade
+            // assume-se que cliente.DataNascimento possa vir com Kind=Unspecified
+            cliente.DataNascimento = cliente.DataNascimento.Kind switch
+            {
+                DateTimeKind.Utc   => cliente.DataNascimento,
+                DateTimeKind.Local => cliente.DataNascimento.ToUniversalTime(),
+                _                  => DateTime.SpecifyKind(cliente.DataNascimento, DateTimeKind.Utc)
+            };
+
+            if (cliente.DataNascimento > DateTime.UtcNow.AddYears(-18))
                 return BadRequest("Cliente deve ter 18 anos ou mais.");
 
             _context.Clientes.Add(cliente);
@@ -79,7 +91,7 @@ namespace PedidoClientManagement.API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var cliente = await _context.Clientes.FindAsync(id);
-            if (cliente == null) 
+            if (cliente == null)
                 return NotFound();
 
             _context.Clientes.Remove(cliente);
@@ -107,7 +119,6 @@ namespace PedidoClientManagement.API.Controllers
 
             var tempCpf = cpf.Substring(0, 9);
             int sum = 0;
-
             for (int i = 0; i < 9; i++)
                 sum += (tempCpf[i] - '0') * mult1[i];
 
@@ -115,7 +126,6 @@ namespace PedidoClientManagement.API.Controllers
             int firstDigit = remainder < 2 ? 0 : 11 - remainder;
             tempCpf += firstDigit;
             sum = 0;
-
             for (int i = 0; i < 10; i++)
                 sum += (tempCpf[i] - '0') * mult2[i];
 
