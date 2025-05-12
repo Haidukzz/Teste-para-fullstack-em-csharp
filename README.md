@@ -27,7 +27,7 @@ Trata-se de um serviço backend escrito em C# utilizando .NET, expondo endpoints
 │ ├── {timestamp}_InicialPostgres.cs
 │ └── AppDbContextModelSnapshot.cs
 ├── appsettings.json
-└── Program.cs```
+└── Program.cs ```
 
 
 - **Controllers/**  
