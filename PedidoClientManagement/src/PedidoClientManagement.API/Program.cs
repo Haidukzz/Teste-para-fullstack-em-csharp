@@ -13,7 +13,7 @@ var fixedConnectionString =
     "Port=5432;" +
     "Database=pedido_client_db_1164;" +
     "Username=haidukzz;" +
-    "Password=6rs2dR2WYslMVvJwi7uwRPnes6U8BDFg;" +
+    "Password=6rs2dR2WYsNMtvJw17uwRPNes6UfBDFg;" +
     "SSL Mode=Require;Trust Server Certificate=true";
 
 Console.WriteLine($"→ Usando internal connection string: {fixedConnectionString}");
