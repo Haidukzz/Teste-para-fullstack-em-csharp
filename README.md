@@ -13,21 +13,6 @@ Trata-se de um serviço backend escrito em C# utilizando .NET, expondo endpoints
 - **PostgreSQL** – Banco de dados relacional (instância hospedada no Render).  
 - **Render** – Plataforma de hospedagem em nuvem usada para deploy da API e do banco.
 
-```PedidoClientManagement.API/
-├── Controllers/
-│ ├── ClientesController.cs
-│ └── PedidosController.cs
-├── Models/
-│ ├── Cliente.cs
-│ ├── Pedido.cs
-│ └── ItemPedido.cs
-├── Data/
-│ ├── AppDbContext.cs
-│ └── Migrations/
-│ ├── {timestamp}_InicialPostgres.cs
-│ └── AppDbContextModelSnapshot.cs
-├── appsettings.json
-└── Program.cs ```
 
 
 - **Controllers/**  
@@ -58,3 +43,20 @@ A API está implantada e disponível publicamente no Render.
 Para testar, use a **URL base**:
 
 https://pedido-client-management.onrender.com
+
+## Organização do Projeto
+```PedidoClientManagement.API/
+├── Controllers/
+│ ├── ClientesController.cs
+│ └── PedidosController.cs
+├── Models/
+│ ├── Cliente.cs
+│ ├── Pedido.cs
+│ └── ItemPedido.cs
+├── Data/
+│ ├── AppDbContext.cs
+│ └── Migrations/
+│ ├── {timestamp}_InicialPostgres.cs
+│ └── AppDbContextModelSnapshot.cs
+├── appsettings.json
+└── Program.cs
