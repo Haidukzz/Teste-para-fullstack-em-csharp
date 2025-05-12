@@ -1,0 +1,29 @@
+# Build artefacts
+bin/
+obj/
+
+# VS Code
+.vscode/
+
+# User-specific files
+*.user
+*.suo
+
+# Configurações locais sensíveis
+appsettings.json
+**/appsettings.Development.json
+
+# Para caches do Docker
+**/docker-compose*.yml
+
+# Logs
+*.log
+
+# Publicação
+publish/
+
+# Projetos Rider
+.idea/
+
+# Outros
+*.DS_Store

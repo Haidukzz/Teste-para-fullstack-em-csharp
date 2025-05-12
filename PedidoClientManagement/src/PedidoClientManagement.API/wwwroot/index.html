@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Movtech | Cadastro Cliente</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      background: #f8f9fa; /* fundo claro */
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .centered {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 1rem;
+    }
+    .card-custom {
+      width: 100%;
+      max-width: 360px;
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .card-custom .card-header {
+      background: #ffffff;
+      border-bottom: 1px solid #e9ecef;
+      text-align: center;
+      font-weight: 600;
+      color: #343a40;
+      padding: 1rem;
+    }
+    .card-custom .card-body {
+      padding: 1.5rem;
+    }
+    .form-label {
+      font-weight: 500;
+      color: #495057;
+    }
+    .btn-custom {
+      background-color: #2563eb; /* tom de azul Movtech */
+      color: white;
+      border: none;
+      transition: background-color .3s;
+    }
+    .btn-custom:hover {
+      background-color: #1e40af;
+    }
+    .link-login {
+      display: block;
+      text-align: center;
+      margin-top: 1rem;
+      color: #6c757d;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color .2s;
+    }
+    .link-login:hover {
+      color: #343a40;
+    }
+  </style>
+</head>
+<body>
+  <div class="centered">
+    <div class="card card-custom">
+      <div class="card-header">
+        <h5 class="mb-0">Cadastro de Cliente</h5>
+      </div>
+      <div class="card-body">
+        <form onsubmit="return cadastrarCliente(event)">
+          <div class="mb-3">
+            <label class="form-label">Nome *</label>
+            <input id="cadNome" class="form-control" placeholder="Seu nome completo" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email *</label>
+            <input id="cadEmail" type="email" class="form-control" placeholder="exemplo@dominio.com" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Data de Nascimento *</label>
+            <input id="cadData" type="date" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">CPF *</label>
+            <input id="cadCpf" class="form-control" maxlength="11" placeholder="Só números" required>
+          </div>
+          <button type="submit" class="btn btn-custom w-100">Cadastrar</button>
+        </form>
+        <a href="login.html" class="link-login">Já sou cliente, fazer login →</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    async function cadastrarCliente(evt) {
+      evt.preventDefault();
+      const cli = {
+        nome: document.getElementById('cadNome').value.trim(),
+        email: document.getElementById('cadEmail').value.trim(),
+        dataNascimento: document.getElementById('cadData').value,
+        cpf: document.getElementById('cadCpf').value.trim(),
+      };
+      try {
+        const res = await fetch('/api/clientes', {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json','Accept':'application/json' },
+          body: JSON.stringify(cli)
+        });
+        if (!res.ok) {
+          alert(await res.text());
+          return false;
+        }
+        const criado = await res.json();
+        window.location.href = `pedidos.html?clienteId=${criado.id}`;
+      } catch {
+        alert('Erro de conexão com o servidor.');
+      }
+      return false;
+    }
+  </script>
+</body>
+</html>

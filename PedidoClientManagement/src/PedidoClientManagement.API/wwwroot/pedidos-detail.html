@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Detalhes do Pedido</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <div class="container py-5">
+    <button class="btn btn-secondary mb-4" onclick="history.back()">
+      ← Voltar à Lista
+    </button>
+
+    <h1>Pedido #<span id="pedidoId">–</span></h1>
+    <p>
+      <strong>Cliente:</strong> <span id="clienteNome">–</span><br>
+      <strong>Data:</strong> <span id="pedidoData">–</span><br>
+      <strong>Total:</strong> R$ <span id="pedidoTotal">0.00</span>
+    </p>
+
+    <h3>Itens</h3>
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered">
+        <thead class="table-light">
+          <tr><th>#</th><th>Descrição</th><th>Qtd</th><th>Preço Unit. (R$)</th><th>Sub-Total (R$)</th></tr>
+        </thead>
+        <tbody id="itensBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const qs = new URLSearchParams(location.search);
+    const id = qs.get('id');
+    if (!id) {
+      alert('ID de pedido não informado.');
+      history.back();
+    }
+
+    async function carregarDetalhes() {
+      try {
+        const res = await fetch(`/api/pedidos/${id}`);
+        if (!res.ok) throw new Error(await res.text());
+        const p = await res.json();
+
+        document.getElementById('pedidoId').textContent    = p.id;
+        document.getElementById('clienteNome').textContent = p.cliente.nome;
+        document.getElementById('pedidoData').textContent  =
+          new Date(p.dataPedido).toLocaleString();
+        document.getElementById('pedidoTotal').textContent = 
+          p.valorTotal.toFixed(2);
+
+        const tb = document.getElementById('itensBody');
+        tb.innerHTML = '';
+        p.itens.forEach((it, i) => {
+          const subt = it.quantidade * it.precoUnitario;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${i+1}</td>
+            <td>${it.descricao}</td>
+            <td>${it.quantidade}</td>
+            <td>${it.precoUnitario.toFixed(2)}</td>
+            <td>${subt.toFixed(2)}</td>`;
+          tb.append(tr);
+        });
+      }
+      catch(err) {
+        alert('Erro ao carregar detalhes:\n'+err);
+      }
+    }
+
+    carregarDetalhes();
+  </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gerenciar Clientes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <div class="container py-5">
+    <!-- Voltar ao início -->
+    <a href="index.html" class="btn btn-secondary mb-4">
+      ← Voltar ao Início
+    </a>
+
+    <h1>Clientes Cadastrados</h1>
+    <div id="alertPlaceholder"></div>
+
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>Id</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Data Nasc.</th>
+            <th>CPF</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="clientesBody">
+          <!-- preenchido via JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const tbody = document.getElementById('clientesBody');
+    const alertEl = document.getElementById('alertPlaceholder');
+
+    // exibe alert bootstrap
+    function showAlert(type, msg) {
+      alertEl.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+          ${msg}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`;
+    }
+
+    // carrega todos os clientes
+    async function carregarClientes() {
+      try {
+        const res = await fetch('/api/clientes');
+        if (!res.ok) throw new Error(res.statusText);
+        const lista = await res.json();
+        tbody.innerHTML = '';
+
+        if (lista.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="text-center">Nenhum cliente cadastrado.</td></tr>`;
+          return;
+        }
+
+        lista.forEach(c => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${c.id}</td>
+            <td>${c.nome}</td>
+            <td>${c.email}</td>
+            <td>${new Date(c.dataNascimento).toLocaleDateString()}</td>
+            <td>${c.cpf}</td>
+            <td>
+              <button class="btn btn-sm btn-danger btn-excluir">
+                <i class="fa fa-trash"></i> Excluir
+              </button>
+            </td>
+          `;
+          // listener do botão excluir
+          tr.querySelector('.btn-excluir').onclick = () => excluirCliente(c.id, c.nome);
+          tbody.append(tr);
+        });
+      }
+      catch (err) {
+        showAlert('danger', 'Erro ao carregar clientes: ' + err);
+      }
+    }
+
+    // exclui um cliente
+    async function excluirCliente(id, nome) {
+      if (!confirm(`Deseja realmente excluir o cliente “${nome}” (ID ${id})?`)) return;
+      try {
+        const res = await fetch(`/api/clientes/${id}`, { method: 'DELETE' });
+        if (res.status === 404) {
+          showAlert('warning', 'Cliente não encontrado.');
+          return;
+        }
+        if (!res.ok) throw new Error(res.statusText);
+        showAlert('success', `Cliente “${nome}” excluído com sucesso.`);
+        await carregarClientes();
+      }
+      catch (err) {
+        showAlert('danger', 'Erro ao excluir cliente: ' + err);
+      }
+    }
+
+    // inicializa
+    carregarClientes();
+  </script>
+
+  <!-- FontAwesome e Bootstrap JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
