@@ -8,15 +8,15 @@ using PedidoClientManagement.API.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // 1) String fixa com sua senha embutida
-var fixedConnectionString = 
-    "Host=dpg-d0h4j33e5dus73d4ifcg-a.oregon-postgres.render.com;" +
+var fixedConnectionString =
+    "Host=dpg-d0h4j33e5dus73d4ifcg-a;" +  // << host interno, sem .render.com
     "Port=5432;" +
     "Database=pedido_client_db_1164;" +
     "Username=haidukzz;" +
     "Password=6rs2dR2WYslMVvJwi7uwRPnes6U8BDFg;" +
     "SSL Mode=Require;Trust Server Certificate=true";
 
-Console.WriteLine($"→ Usando hard-coded connection string: {fixedConnectionString}");
+Console.WriteLine($"→ Usando internal connection string: {fixedConnectionString}");
 
 // 2) EF + PostgreSQL usando a string fixa
 builder.Services.AddDbContext<AppDbContext>(opt =>
